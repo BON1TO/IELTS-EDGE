@@ -57,7 +57,7 @@ export default function HomePage() {
         });
       }
 
-      // Batch reveal features — single ScrollTrigger (cheap)
+      // Batch reveal features — single ScrollTrigger 
       const features = gsap.utils.toArray(".feature-card");
       if (features.length) {
         gsap.from(features, {
