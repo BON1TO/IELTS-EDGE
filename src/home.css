@@ -457,8 +457,7 @@ html,body,#root { height:100%; }
   html { scroll-padding-top: var(--nav-short-mobile) !important; }
 }
 
-/* OPTIONAL: center the hamburger visually (if you prefer it in the middle).
-   Add the `centered` class to the button in Navbar.jsx: <button className="menu-toggle centered">…</button> */
+
 @media (max-width: 640px) {
   .menu-toggle.centered {
     position: absolute !important;
@@ -754,6 +753,66 @@ html,body,#root { height:100%; }
 
 
 
+/* ===== Restore CTA glow on all viewports (mobile included) ===== */
+/* Use prefers-reduced-motion to respect accessibility preferences */
+@media (prefers-reduced-motion: no-preference) {
+  /* Ensure the keyframes exist (you already have this defined earlier).
+     If you removed it, keep the @keyframes ctaGlowStrong rule in your file. */
+
+  .btn-primary.hero-cta {
+    animation: ctaGlowStrong 2.8s ease-in-out infinite !important;
+    position: relative !important;
+    z-index: 999 !important;            /* above adjacent elements */
+    overflow: visible !important;       /* allow glow outside button box */
+    -webkit-backface-visibility: visible !important;
+    backface-visibility: visible !important;
+  }
+
+  /* Make the focus/pressed state also show a strong glow on mobile when focused */
+  .btn-primary.hero-cta:focus,
+  .btn-primary.hero-cta:active,
+  .btn-primary.hero-cta:focus-visible {
+    outline: none !important;
+    box-shadow: 0 0 36px 12px rgba(34,197,94,0.7), 0 0 0 2px #fff !important;
+    transform: translateY(-4px) scale(1.02) !important;
+  }
+}
+
+/* Fallback for users with reduced motion preference: no animation */
+@media (prefers-reduced-motion: reduce) {
+  .btn-primary.hero-cta { animation: none !important; }
+}
+
+/* Safety: ensure full-width CTAs preserved while glow can escape bounding box */
+.hero-left .btn-primary.hero-cta,
+.btn-primary.hero-cta {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: visible !important;
+}
+
+/* If any parent had overflow:hidden (which would clip the glow), allow the glow to be visible */
+.hero-left, .hero-right, .mock-card { overflow: visible !important; }
+
+
+
+
+/* Improve "Details" button contrast */
+.card-btn.plain {
+  background: #ffffff !important;
+  color: #0b1220 !important;   /* dark text */
+  border: 1px solid rgba(0,0,0,0.08) !important;
+}
+.card-btn.plain:hover,
+.card-btn.plain:focus {
+  background: #f4f7f6 !important;   /* slight off-white hover */
+  color: #0b1220 !important;
+}
+[data-theme="dark"] .card-btn.plain {
+  background: #ffffff !important;
+  color: #0b1220 !important;
+}
 
 
 
