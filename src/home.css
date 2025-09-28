@@ -1,8 +1,4 @@
-/* src/home.css
-   Optimized & deduplicated — keeps all visuals, animations, spacing and dark-mode behavior.
-
-   UPDATED: forces features and testimonials grids to always display vertically
-*/
+/* src/home.css */
 
 /* ---------------- PALETTE & ROOT ---------------- */
 :root{
@@ -109,12 +105,12 @@ html,body,#root { height:100%; }
 .features-section .grid { gap:2.5rem; }
 .testimonials-section .grid { gap:2rem; }
 
-/* --- FORCE VERTICAL LAYOUT: always single-column for features & testimonials --- */
+/*  FORCE VERTICAL LAYOUT: always single-column for features & testimonials*/
 .features-section .grid,
 .testimonials-section .grid {
-  display: grid;              /* use grid for predictable gaps */
-  grid-template-columns: 1fr; /* single column always */
-  gap: 2rem;                  /* equal vertical gaps between items */
+  display: grid;              
+  grid-template-columns: 1fr; 
+  gap: 2rem;                  
 }
 
 /* feature card */
