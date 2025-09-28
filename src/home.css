@@ -141,7 +141,7 @@ html,body,#root { height:100%; }
   position:fixed; top:0; left:0; right:0; width:100%; z-index:1000;
   background:#0b1220; color:#fff; border-bottom:1px solid rgba(255,255,255,0.08); box-shadow:0 2px 6px rgba(0,0,0,0.2);
 }
-.navbar-container{ max-width:1200px; margin:0 auto; padding:.9rem 1.5rem; display:flex; align-items:center; justify-content:space-between; }
+.navbar-container{ max-width:1200px; margin:0 auto; padding:.1rem .5rem; display:flex; align-items:center; justify-content:space-between; }
 .navbar-logo{ display:flex; align-items:center; gap:.6rem; text-decoration:none; }
 .logo-box{ width:38px; height:38px; border-radius:10px; background:linear-gradient(135deg,#16a34a,#15803d); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:.95rem; box-shadow:0 3px 8px rgba(22,163,74,0.3); }
 .logo-text{ font-weight:700; font-size:1rem; color:#fff; }
@@ -807,3 +807,172 @@ html { scroll-padding-top: var(--nav-height-dynamic); }
 /* ensure the site spacer is active (if dynamic JS set the var) */
 .site-root .nav-spacer { display:block; height: var(--nav-height-dynamic, 56px) !important; }
 html { scroll-padding-top: var(--nav-height-dynamic, 56px) !important; }
+
+
+
+
+
+
+
+
+
+
+/* ===== HAMBURGER MENU: CSS to show/hide and animate links ===== */
+
+/* toggle button (hidden on desktop) */
+.menu-toggle {
+  display: none;
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-size: 1.15rem;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+/* base navbar-links behaviour */
+.navbar-links {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  transition: max-height 0.28s ease, opacity 0.28s ease;
+  max-height: 999px; /* desktop default (open) */
+  overflow: visible;
+}
+
+/* small-screen behaviour: hide links by default and show when .open */
+@media (max-width: 900px) {
+  .menu-toggle { display: block; }
+
+  .navbar-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: stretch;
+    width: 100%;
+    max-height: 0;         /* hidden by default */
+    overflow: hidden;
+    padding: 0 0.5rem;
+    background: transparent;
+    opacity: 0;
+    border-radius: 8px;
+  }
+
+  .navbar-links.open {
+    max-height: 420px;     /* enough to show your 3 links + spacing */
+    opacity: 1;
+  }
+
+  /* make links tappable full width on mobile */
+  .navbar-links a {
+    display: block;
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    border-radius: 8px;
+    text-align: left;
+  }
+
+  /* position action buttons to the right (or below depending on .navbar-container) */
+  .navbar-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+
+
+
+
+/* ===== NAV LINKS FORCE-VISIBILITY (paste at end of home.css) ===== */
+
+/* ensure navbar and its container are on top and fully visible */
+.navbar {
+  z-index: 1400 !important;
+  background: #0b1220 !important;
+}
+
+/* ensure the inner container is visible and contains children */
+.navbar-container {
+  position: relative !important;
+  z-index: 1401 !important;
+}
+
+/* force links visible + high contrast + clickable */
+.navbar-links,
+.navbar-links a {
+  display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  transform: none !important;
+  -webkit-transform: none !important;
+}
+
+/* ensure anchor text is readable (white) and not transparent */
+.navbar-links a {
+  color: #ffffff !important;
+  background: transparent !important;
+  text-decoration: none !important;
+  transition: color .12s ease, background .12s ease !important;
+}
+
+/* If GSAP left inline style opacity:0, override it */
+.navbar-links[style] { opacity: 1 !important; }
+
+/* If max-height based hiding is used, allow full height on desktop */
+@media (min-width: 901px) {
+  .navbar-links { max-height: 9999px !important; overflow: visible !important; }
+}
+
+/* if there is an overlapping element with pointer-events: none, re-enable pointer events on nav children */
+.navbar * { pointer-events: auto !important; }
+
+/* visual debug helper (temporary) — uncomment to see outlines while debugging */
+/* .navbar-links a { outline: 1px dashed rgba(255,255,255,0.12) !important; } */
+
+
+
+
+/* ===== SLIM MOBILE NAVBAR ===== */
+@media (max-width: 640px) {
+  .navbar {
+    padding: 0.25rem 0 !important;   /* less top/bottom space */
+    height: auto !important;         /* shrink to fit content */
+  }
+
+  .navbar-container {
+    padding: 0.4rem 0.8rem !important; /* reduce inside padding */
+    gap: 0.4rem !important;            /* less gap between rows */
+    flex-direction: column;            /* stack vertically */
+  }
+
+  /* logo smaller */
+  .logo-box {
+    width: 30px !important;
+    height: 30px !important;
+    font-size: 0.8rem !important;
+  }
+  .logo-text {
+    font-size: 0.9rem !important;
+  }
+
+  /* links smaller + compact */
+  .navbar-links {
+    gap: 0.35rem !important;
+  }
+  .navbar-links a {
+    font-size: 0.9rem !important;
+    padding: 0.4rem 0.5rem !important;
+  }
+
+  /* actions smaller */
+  .navbar-actions .login-btn,
+  .navbar-actions .dark-toggle {
+    font-size: 0.85rem !important;
+    padding: 0.35rem 0.6rem !important;
+    min-height: 32px !important;
+  }
+}

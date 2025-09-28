@@ -1,20 +1,27 @@
 // src/components/Navbar.jsx
-import React, { useEffect, useState, useRef } from "react"; // <-- added useRef
+import React, { useEffect, useState, useRef } from "react";
 import gsap from "gsap";
 import { Link } from "react-router-dom";
 
 export default function Navbar() {
-  const navbarRef = useRef(null); // new
+  const navbarRef = useRef(null);
+  const navLinksRef = useRef(null);
 
   const [dark, setDark] = useState(() => {
     try {
       const saved = localStorage.getItem("theme");
       if (saved) return saved === "dark";
-      return typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      return (
+        typeof window !== "undefined" &&
+        window.matchMedia &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches
+      );
     } catch {
       return false;
     }
   });
+
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // ensure html data-theme set on mount and whenever changes
   useEffect(() => {
@@ -27,16 +34,17 @@ export default function Navbar() {
   }, [dark]);
 
   useEffect(() => {
-    // GSAP entrance animations
+    // GSAP entrance for navbar bar itself
     gsap.fromTo(".navbar", { y: -60, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "power3.out" });
+    // a small stagger for link fade in (desktop)
     gsap.fromTo(
-      ".navbar a, .navbar .dark-toggle, .navbar .login-btn",
-      { opacity: 0, y: -8 },
-      { opacity: 1, y: 0, stagger: 0.08, delay: 0.25, duration: 0.45, ease: "power2.out" }
+      ".navbar-links a, .navbar .dark-toggle, .navbar .login-btn",
+      { opacity: 0, y: -6 },
+      { opacity: 1, y: 0, stagger: 0.06, delay: 0.18, duration: 0.36, ease: "power2.out" }
     );
   }, []);
 
-  // --------- NEW: measure navbar and set CSS var to exact height ----------
+  // measure navbar height (keeps spacer accurate)
   useEffect(() => {
     const setNavHeight = () => {
       try {
@@ -45,59 +53,84 @@ export default function Navbar() {
         const h = Math.ceil(el.getBoundingClientRect().height);
         document.documentElement.style.setProperty("--nav-height-dynamic", `${h}px`);
         document.documentElement.style.setProperty("scroll-padding-top", `${h}px`);
-      } catch (e) {
-        // ignore
-      }
+      } catch (e) {}
     };
 
-    // initial measure
     setNavHeight();
-
-    // refresh on resize / orientation change
     window.addEventListener("resize", setNavHeight);
     window.addEventListener("orientationchange", setNavHeight);
-
-    // fonts can change layout — measure after fonts ready
-    if (document.fonts && document.fonts.ready) {
-      document.fonts.ready.then(setNavHeight).catch(() => {});
-    }
-
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(setNavHeight).catch(()=>{});
     return () => {
       window.removeEventListener("resize", setNavHeight);
       window.removeEventListener("orientationchange", setNavHeight);
     };
   }, []);
-  // ---------------------------------------------------------------------
 
-  const handleToggle = () => {
+  // Close menu when viewport becomes wide (so links don't stay toggled on desktop)
+  useEffect(() => {
+    const onResize = () => {
+      if (window.innerWidth > 900 && menuOpen) setMenuOpen(false);
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [menuOpen]);
+
+  // animate open/close with GSAP (optional — uses maxHeight CSS but we add a soft opacity tween)
+  useEffect(() => {
+    const el = navLinksRef.current;
+    if (!el) return;
+    if (menuOpen) {
+      // quickly animate opacity for smoothness
+      gsap.to(el, { duration: 0.28, opacity: 1, ease: "power2.out" });
+    } else {
+      gsap.to(el, { duration: 0.18, opacity: 0, ease: "power2.in" });
+    }
+  }, [menuOpen]);
+
+  const handleToggle = () => setMenuOpen((s) => !s);
+
+  const handleThemeToggle = () => {
     setDark((d) => {
       const next = !d;
       try {
         document.documentElement.setAttribute("data-theme", next ? "dark" : "light");
         localStorage.setItem("theme", next ? "dark" : "light");
       } catch {}
-      console.log("Theme toggled ->", next ? "dark" : "light");
       return next;
     });
   };
 
   return (
-    // attach ref here
     <header ref={navbarRef} className="navbar" role="banner">
       <div className="navbar-container">
         {/* Logo */}
-        <a href="#home" className="navbar-logo" aria-label="IeltsEdge home">
+        <Link to="/" className="navbar-logo" aria-label="IeltsEdge home">
           <div className="logo-box" aria-hidden>
             IE
           </div>
           <span className="logo-text">IeltsEdge</span>
-        </a>
+        </Link>
 
-        {/* Menu links */}
-        <nav className="navbar-links" role="navigation" aria-label="Main">
-          <a href="#features">Features</a>
-          <a href="#testimonials">Testimonials</a>
-          <a href="#contact">Contact</a>
+        {/* Hamburger toggle (visible on small screens) */}
+        <button
+          className="menu-toggle"
+          onClick={handleToggle}
+          aria-expanded={menuOpen}
+          aria-label={menuOpen ? "Close navigation" : "Open navigation"}
+        >
+          <span aria-hidden>{menuOpen ? "✖" : "☰"}</span>
+        </button>
+
+        {/* Links (hidden on mobile unless menuOpen) */}
+        <nav
+          ref={navLinksRef}
+          className={`navbar-links ${menuOpen ? "open" : ""}`}
+          role="navigation"
+          aria-label="Main"
+        >
+          <a href="#features" onClick={() => setMenuOpen(false)}>Features</a>
+          <a href="#testimonials" onClick={() => setMenuOpen(false)}>Testimonials</a>
+          <a href="#contact" onClick={() => setMenuOpen(false)}>Contact</a>
         </nav>
 
         {/* Right side actions: dark toggle + login */}
@@ -105,7 +138,7 @@ export default function Navbar() {
           <button
             type="button"
             className="dark-toggle"
-            onClick={handleToggle}
+            onClick={handleThemeToggle}
             aria-pressed={dark}
             aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
             title={dark ? "Light mode" : "Dark mode"}
@@ -113,7 +146,6 @@ export default function Navbar() {
             {dark ? "🌞" : "🌙"}
           </button>
 
-          {/* client-side navigation using Link */}
           <Link to="/login" className="login-btn" aria-label="Login">
             🔑 Login
           </Link>
