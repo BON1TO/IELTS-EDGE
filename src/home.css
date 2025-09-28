@@ -647,6 +647,122 @@ html,body,#root { height:100%; }
 
 
 
+/* ===== Mobile: balanced hero spacing (paste at end of home.css) ===== */
+@media (max-width: 640px) {
+  /* base spacing tokens — tweak these to tune rhythm */
+  :root {
+    --hero-gap-mobile: 1.05rem;   /* vertical gap between eyebrow / title / subtitle / ctas */
+    --cta-gap-mobile: 0.6rem;     /* gap between CTA buttons */
+    --stat-gap-mobile: 0.6rem;    /* space between stat items */
+    --hero-bottom-space: 1rem;    /* space between hero and mock-card */
+  }
+
+  /* Make the left hero column a clean vertical stack with consistent spacing */
+  .hero-left {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: var(--hero-gap-mobile) !important;
+    align-items: flex-start !important;
+    width: 100% !important;
+    box-sizing: border-box;
+    padding: 0 !important;
+  }
+
+  /* Slightly reduce eyebrow size and ensure it doesn't cause overflow */
+  .eyebrow {
+    font-size: 0.82rem !important;
+    padding: 5px 8px !important;
+    white-space: nowrap;
+  }
+
+  /* Title / subtitle spacing and legibility */
+  .hero-title {
+    font-size: 1.6rem !important;
+    line-height: 1.05 !important;
+    margin: 0 !important;
+    word-break: break-word;
+  }
+  .hero-sub {
+    margin: 0 !important;
+    font-size: 0.95rem !important;
+    max-width: 48ch !important;
+    color: rgba(230,238,231,0.92) !important;
+  }
+
+  /* CTAs: vertical stack, full-width, consistent gap */
+  .hero-left .mt-6 { /* wrapper around CTAs in your JSX */
+    display: flex !important;
+    flex-direction: column !important;
+    gap: var(--cta-gap-mobile) !important;
+    width: 100% !important;
+    padding: 0 !important;
+    box-sizing: border-box;
+  }
+  .hero-left .btn-primary,
+  .hero-left .btn-outline {
+    width: 100% !important;
+    padding: .7rem 0 !important;
+    font-size: 0.95rem !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
+
+  /* Stats: distribute evenly across the row */
+  .stats {
+    display: flex !important;
+    gap: var(--stat-gap-mobile) !important;
+    width: 100% !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    margin-top: 0 !important;
+    box-sizing: border-box;
+  }
+  .stats > div {
+    flex: 1 1 0% !important;
+    min-width: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important; /* or center if you prefer */
+    gap: .15rem !important;
+  }
+  /* option: center stat blocks for symmetrical look */
+  /* .stats > div { align-items: center !important; text-align: center !important; } */
+
+  /* Add breathing room between hero-left and the mock card below */
+  .hero-right { margin-top: var(--hero-bottom-space) !important; }
+
+  /* Make mock-card fit and align with hero left column width */
+  .mock-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 1rem !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+  }
+
+  /* Make sure hero content doesn't overflow horizontally */
+  .hero-section, .hero-section .container { overflow: visible !important; }
+
+  /* Tweak typography inside mock-card for compactness */
+  .mock-title { font-size: 1rem !important; }
+  .mock-sub { font-size: .92rem !important; }
+
+  /* ensure CTA glow still visible while full-width */
+  .btn-primary.hero-cta { box-shadow: 0 8px 28px rgba(22,163,74,0.14) !important; }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
