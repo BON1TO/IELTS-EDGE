@@ -632,7 +632,7 @@ html,body,#root { height:100%; }
 }
 
 .features-section .grid > *:first-child {
-  margin-bottom: 1rem; /* reduce space only after 1st card */
+  margin-bottom: 0rem; /* reduce space only after 1st card */
 }
 
 
