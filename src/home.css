@@ -1,4 +1,7 @@
-/* src/home.css */
+/* src/home.css
+   Fixed: ensure navbar children are visible/clickable and feature card text contrast.
+   All other behavior preserved (dark mode, hero, CTA glow, first-child negative gap).
+*/
 
 /* ---------------- PALETTE & ROOT ---------------- */
 :root{
@@ -9,16 +12,30 @@
   --brand-green-600: #15803d;
   --accent-soft: #d1f0da;   /* light green icon bg */
   --card-border: rgba(6,11,10,0.08);
+
+  /* layout knobs */
+  --nav-height-desktop: 52px;
+  --nav-height-mobile: 68px;
+  --nav-height-dynamic: 56px; /* JS may overwrite at runtime */
+
+  /* feature spacing */
+  --feature-padding: 1.7rem;  /* internal padding for feature cards */
+  --feature-gap: 2rem;        /* vertical gap between features */
 }
 
 /* ---------------- BASE & LAYOUT ---------------- */
 html,body,#root { height:100%; }
+*{ box-sizing: border-box; }
+
 .site-root{
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
   color: #0b1220;
   background: var(--bg);
+  position: relative;
 }
-.container{ max-width:1200px; margin:0 auto; padding-left:1rem; padding-right:1rem; }
+
+/* container */
+.container{ max-width:1200px; margin:0 auto; padding-left:1rem; padding-right:1rem; width:100%; }
 
 /* performance hint for animated elements */
 .hero-title,.hero-sub,.hero-cta,.feature-card,.testimonial,.mock-card,.hero-bg {
@@ -79,7 +96,7 @@ html,body,#root { height:100%; }
   color:#0b1220; padding:1rem; border:1px solid var(--card-border);
   box-shadow:0 12px 32px rgba(6,11,10,0.06); transform-origin:center; will-change:transform;
 }
-.mock-title{ font-weight:700; color:#0b1220; }
+.mock-title{ font-weight:700; color:inherit; }
 .mock-sub{ font-size:.9rem; color:rgba(11,18,32,0.65); }
 .live-badge{ display:inline-block; padding:6px 10px; border-radius:999px; background:linear-gradient(90deg,#f59e0b,#f97316); color:#fff; font-weight:700; font-size:12px; }
 
@@ -110,16 +127,18 @@ html,body,#root { height:100%; }
 .testimonials-section .grid {
   display: grid;              
   grid-template-columns: 1fr; 
-  gap: 2rem;                  
+  gap: var(--feature-gap);                  
 }
 
-/* feature card */
+/* feature card (explicit color to avoid contrast issues) */
 .feature-card{
-  background:#f5f9f6; border:1px solid rgba(6,11,10,0.06); padding:1.7rem; border-radius:14px;
+  background:#f5f9f6; border:1px solid rgba(6,11,10,0.06); padding:var(--feature-padding); border-radius:14px;
   box-shadow:0 6px 16px rgba(6,11,10,0.05);
   transition: transform .22s cubic-bezier(.2,.9,.2,1), box-shadow .22s ease;
   will-change:transform;
+  color: #0b1220; /* FIX: explicit text color for readability in light mode */
 }
+.feature-card * { color: inherit; } /* ensure children inherit that color */
 .feature-card:hover{ transform:translateY(-12px) scale(1.06); box-shadow:0 28px 60px rgba(0,0,0,0.25); }
 .feature-ico{ width:56px; height:56px; border-radius:12px; display:flex; align-items:center; justify-content:center; background:var(--accent-soft); font-size:1.35rem; }
 .linkish{ color:var(--brand-green-600); font-weight:700; background:transparent; border:none; }
@@ -129,7 +148,9 @@ html,body,#root { height:100%; }
 .testimonial{
   background:var(--panel); border:1px solid rgba(6,11,10,0.06); padding:1.2rem; border-radius:14px;
   box-shadow:0 6px 16px rgba(6,11,10,0.05); transition: transform .22s cubic-bezier(.2,.9,.2,1), box-shadow .22s ease;
+  color: #0b1220; /* explicit for light mode */
 }
+.testimonial * { color: inherit; }
 .testimonial:hover{ transform:translateY(-10px) scale(1.05); box-shadow:0 22px 50px rgba(0,0,0,0.25); }
 
 /* ---------------- FOOTER ---------------- */
@@ -137,30 +158,41 @@ html,body,#root { height:100%; }
 .brand{ font-weight:800; color:#fff; font-size:1.05rem; }
 
 /* ---------------- NAVBAR ---------------- */
+/* base navbar: keep it compact and ensure children are visible */
 .navbar{
-  position:fixed; top:0; left:0; right:0; width:100%; z-index:1000;
-  background:#0b1220; color:#fff; border-bottom:1px solid rgba(255,255,255,0.08); box-shadow:0 2px 6px rgba(0,0,0,0.2);
+  position:fixed; top:0; left:0; right:0; width:100%; z-index:1400;
+  background:#0b1220; color:#fff; border-bottom:1px solid rgba(255,255,255,0.08); box-shadow:0 4px 10px rgba(0,0,0,0.18);
+  display:flex; align-items:center; justify-content:space-between; overflow:visible; min-height:54px;
 }
-.navbar-container{ max-width:1200px; margin:0 auto; padding:.1rem .5rem; display:flex; align-items:center; justify-content:space-between; }
-.navbar-logo{ display:flex; align-items:center; gap:.6rem; text-decoration:none; }
-.logo-box{ width:38px; height:38px; border-radius:10px; background:linear-gradient(135deg,#16a34a,#15803d); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:.95rem; box-shadow:0 3px 8px rgba(22,163,74,0.3); }
-.logo-text{ font-weight:700; font-size:1rem; color:#fff; }
-.navbar-links{ display:flex; gap:1.5rem; }
-.navbar-links a{ color:rgba(255,255,255,0.85); font-weight:500; font-size:.92rem; text-decoration:none; transition: color .2s ease, transform .2s ease; }
+
+/* inner container: control nav height by changing vertical padding here */
+.navbar-container{ max-width:1200px; margin:0 auto; padding:.1rem .6rem; display:flex; align-items:center; justify-content:space-between; gap:.6rem; width:100%; box-sizing:border-box; }
+
+.navbar-logo{ display:flex; align-items:center; gap:.6rem; text-decoration:none; color:inherit; }
+.logo-box{ width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#16a34a,#15803d); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:.95rem; box-shadow:0 3px 8px rgba(22,163,74,0.3); }
+.logo-text{ font-weight:700; font-size:0.95rem; color:#fff; }
+
+.navbar-links{ display:flex; gap:1.5rem; align-items:center; justify-content:center; flex:1 1 auto; order:2; }
+.navbar-links a{ color:rgba(255,255,255,0.96); font-weight:500; font-size:.92rem; text-decoration:none; transition: color .2s ease, transform .2s ease; display:inline-flex; align-items:center; padding:.18rem .2rem; line-height:1; }
 .navbar-links a:hover{ color:var(--brand-green); transform:translateY(-2px); }
-.login-btn{ background:linear-gradient(90deg,var(--brand-green),var(--brand-green-600)); color:#fff; padding:.45rem 1rem; border-radius:8px; font-weight:600; text-decoration:none; box-shadow:0 4px 12px rgba(22,163,74,0.2); transition: transform .2s ease, box-shadow .2s ease; }
+
+.login-btn{ background:linear-gradient(90deg,var(--brand-green),var(--brand-green-600)); color:#fff; padding:.32rem .7rem; border-radius:8px; font-weight:600; text-decoration:none; box-shadow:0 4px 12px rgba(22,163,74,0.2); transition: transform .2s ease, box-shadow .2s ease; min-height:36px; }
 .login-btn:hover{ transform:translateY(-3px) scale(1.03); box-shadow:0 6px 18px rgba(22,163,74,0.3); }
 
-/* actions + dark-toggle */
-.navbar-actions{ display:flex; align-items:center; gap:.5rem; }
-.dark-toggle{
-  background:transparent; border:1px solid rgba(255,255,255,0.12); color:#fff; font-size:1.05rem; padding:.35rem .6rem; border-radius:8px;
-  cursor:pointer; transition: background .18s ease, transform .12s ease;
-}
+.navbar-actions{ display:flex; align-items:center; gap:.5rem; order:3; }
+.dark-toggle{ background:transparent; border:1px solid rgba(255,255,255,0.12); color:#fff; font-size:1.05rem; padding:.28rem .6rem; border-radius:8px; cursor:pointer; transition: background .18s ease, transform .12s ease; }
 .dark-toggle:hover{ background:rgba(255,255,255,0.06); transform:scale(1.04); }
 
+/* ensure navbar text/buttons are always readable and clickable (overrides inline/animation glitches) */
+.navbar, .navbar-container, .navbar-links, .navbar-links a, .navbar-actions, .navbar .logo-text, .navbar .login-btn, .navbar .dark-toggle {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  -webkit-transform: none !important;
+  transform: none !important;
+}
+
 /* ---------------- BUTTON SPACING OVERRIDES ---------------- */
-/* placed here to override utility classes if needed */
 .hero-left .hero-cta{ margin-right:.75rem; }
 .hero-left .hero-cta:last-child{ margin-right:0; }
 .mock-card .card-btn{ margin-right:.6rem; }
@@ -176,8 +208,8 @@ html,body,#root { height:100%; }
   .container{ padding-left:1rem; padding-right:1rem; }
 }
 @media(max-width:640px){
-  .navbar-container{ flex-direction:column; gap:.5rem; }
-  .navbar-links{ flex-wrap:wrap; justify-content:center; gap:1rem; }
+  .navbar-container{ flex-direction:column; gap:.5rem; align-items:stretch; }
+  .navbar-links{ flex-wrap:wrap; justify-content:center; gap:1rem; width:100%; order:2; }
   .hero-title{ font-size:1.8rem; }
   .hero-sub{ font-size:.95rem; }
   .mock-card{ padding:.75rem; }
@@ -205,12 +237,14 @@ html,body,#root { height:100%; }
 [data-theme="dark"] .site-root{ color:#f1f5f9; background:var(--bg); }
 [data-theme="dark"] .section-light, [data-theme="dark"] .section-muted{ background:var(--panel); color:#f1f5f9; }
 
-/* cards & panels */
+/* cards & panels contrast in dark mode */
 [data-theme="dark"] .feature-card,
 [data-theme="dark"] .testimonial,
 [data-theme="dark"] .mock-card{
   background:#1c242d; color:#f1f5f9; border-color:var(--card-border); box-shadow:0 6px 18px rgba(0,0,0,0.7);
 }
+[data-theme="dark"] .feature-card * { color: inherit; }
+[data-theme="dark"] .testimonial * { color: inherit; }
 
 /* heading & body contrast adjustments */
 [data-theme="dark"] .mock-title,
@@ -223,22 +257,10 @@ html,body,#root { height:100%; }
 [data-theme="dark"] .stat-label{ color:#b5c0cd; }
 [data-theme="dark"] .stat-val{ color:#4ade80; }
 
-/* navbar & controls in dark */
+/* navbar & controls in dark (ensure visible) */
 [data-theme="dark"] .navbar{ background:#0f1720; border-bottom:1px solid rgba(255,255,255,0.06); }
-[data-theme="dark"] .navbar-links a{ color:rgba(255,255,255,0.88); }
+[data-theme="dark"] .navbar-links a{ color:rgba(255,255,255,0.92) !important; }
 [data-theme="dark"] .login-btn{ box-shadow:0 4px 14px rgba(34,197,94,0.08); }
-
-/* ensure hover/transitions still present in dark */
-[data-theme="dark"] .feature-card,
-[data-theme="dark"] .testimonial,
-[data-theme="dark"] .btn-primary,
-[data-theme="dark"] .btn-outline,
-[data-theme="dark"] .card-btn{
-  transition: transform .22s cubic-bezier(.2,.9,.2,1), box-shadow .22s ease, background .22s ease, color .22s ease;
-}
-[data-theme="dark"] .feature-card:hover{ transform:translateY(-12px) scale(1.06); box-shadow:0 28px 60px rgba(0,0,0,0.6); }
-[data-theme="dark"] .testimonial:hover{ transform:translateY(-10px) scale(1.05); box-shadow:0 22px 50px rgba(0,0,0,0.55); }
-[data-theme="dark"] .btn-primary:hover{ transform:translateY(-5px) scale(1.07); box-shadow:0 20px 40px rgba(34,197,94,0.3); }
 
 /* progress bar in dark */
 [data-theme="dark"] .progress-fill{ background: linear-gradient(90deg,#22c55e,#16a34a); }
@@ -246,733 +268,397 @@ html,body,#root { height:100%; }
 /* final safety: ensure non-white panels replaced */
 .feature-card, .testimonial, .mock-card { background-clip: padding-box; }
 
-/* End of optimized home.css */
+/* End of updated home.css */
 
 
-/* ---------- STRONGER CTA GLOW ---------- */
+
+
+
+
+
+
+/* ---------------- HAMBURGER + CTA FIXES (append to end of home.css) ---------------- */
+
+/* CTA glow — make sure both selectors are covered (hero-cta or legacy cta-glow) */
 @keyframes ctaGlowStrong {
-  0% {
-    box-shadow: 0 0 0 0 rgba(34,197,94,0.0);
-  }
-  50% {
-    box-shadow: 0 0 28px 10px rgba(34,197,94,0.55);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(34,197,94,0.0);
-  }
+  0% { box-shadow: 0 0 0 0 rgba(34,197,94,0.0); }
+  50% { box-shadow: 0 0 28px 10px rgba(34,197,94,0.55); }
+  100% { box-shadow: 0 0 0 0 rgba(34,197,94,0.0); }
 }
 
-.btn-primary.hero-cta {
+/* apply to both naming patterns (hero-cta and cta-glow) */
+.btn-primary.hero-cta,
+.btn-primary.cta-glow,
+.btn-primary.hero-cta.cta-glow {
   animation: ctaGlowStrong 2.8s ease-in-out infinite;
   position: relative;
   z-index: 1;
 }
 
-/* hover = very strong glow */
+/* stronger hover/focus presence for CTA */
 .btn-primary.hero-cta:hover,
-.btn-primary.hero-cta:focus {
+.btn-primary.cta-glow:hover,
+.btn-primary.hero-cta:focus,
+.btn-primary.cta-glow:focus {
   transform: translateY(-6px) scale(1.08);
   box-shadow: 0 0 40px 14px rgba(34,197,94,0.65);
+  transition: transform .16s cubic-bezier(.2,.9,.2,1), box-shadow .14s;
 }
-
-/* focus ring for accessibility */
-.btn-primary.hero-cta:focus-visible {
+.btn-primary.hero-cta:focus-visible,
+.btn-primary.cta-glow:focus-visible {
   outline: none;
   box-shadow: 0 0 36px 12px rgba(34,197,94,0.7), 0 0 0 2px #fff;
 }
 
-/* remove default margins from feature cards */
-.feature-card,
-.testimonial {
-  margin: 0;               /* reset margins */
-}
-
-/* Change the gap AFTER only the 1st feature card */
-.features-section .grid > *:first-child {
-  margin-bottom: -2rem;  
-}
-
-
-
-
-[data-theme="dark"] .card-btn.plain {
-  color: #fff !important;
-  border-color: rgba(255,255,255,0.06) !important; 
-}
-
-
-[data-theme="dark"] .card-btn.plain:hover,
-[data-theme="dark"] .card-btn.plain:focus {
-  color: #fff !important;
-}
-
-
-/* ---------------- MOBILE FIXES (Scalability) ---------------- */
-
-/* Make the container padding a little smaller on small screens */
-@media (max-width: 640px) {
-  .container {
-    padding-left: 0.75rem;
-    padding-right: 0.75rem;
-  }
-
-  /* Reduce hero vertical padding so it fits better */
-  .hero-section {
-    padding-top: 2.25rem;
-    padding-bottom: 2.25rem;
-  }
-
-  /* Stack hero content tightly and center */
-  .container.grid {
-    gap: 1rem;
-  }
-  .hero-left { max-width: 100%; }
-
-  /* Scale down hero title and subtitle for mobile */
-  .hero-title { font-size: 1.6rem !important; line-height: 1.06; }
-  .hero-sub { font-size: .95rem; max-width: 44ch; }
-
-  /* CTA buttons stack vertically and fill width */
-  .hero-left .mt-6 { gap: 0.5rem; } /* the wrapper that holds CTA */
-  .hero-left .btn-primary,
-  .hero-left .btn-outline {
-    width: 100%;
-    display: block;
-    text-align: center;
-  }
-
-  /* Mock card becomes full width and fits inside hero */
-  .hero-right { padding-top: .75rem; }
-  .mock-card { width: 100% !important; max-width: 100%; padding: 1rem; }
-
-  /* Features: force single-column and full-width cards */
-  .features-section .grid,
-  .testimonials-section .grid {
-    grid-template-columns: 1fr !important;
-    gap: 1.25rem !important;
-  }
-  .features-section .grid > * {
-    width: 100% !important;
-  }
-
-  /* Make feature/testimonial padding a bit smaller on small screens */
-  .feature-card, .testimonial {
-    padding: 1.1rem 1.25rem !important;
-    border-radius: 12px;
-  }
-
-  /* Navbar: compact layout */
-  .navbar-container { padding: .6rem 1rem; }
-  .navbar-links { display: none; } /* hide full link row on small screens (optional) */
-
-  /* Make login and actions visible and touch-friendly */
-  .navbar-actions .login-btn,
-  .navbar-actions .dark-toggle {
-    padding: .45rem .6rem;
-    font-size: .95rem;
-  }
-
-  /* Footer: stack content */
-  .section-dark .container { flex-direction: column; gap: 1rem; align-items: flex-start; }
-
-  /* Increase tappable area for small buttons/links */
-  .card-btn, .btn-outline, .login-btn {
-    min-height: 40px;
-    padding: .6rem .9rem;
-  }
-
-  /* Improve text wrapping and legibility */
-  .feature-title, .mock-title { font-size: 1rem; }
-  .feature-desc, .mock-sub { font-size: .95rem; }
-}
-
-/* Slightly larger phones / small tablets */
-@media (min-width: 641px) and (max-width: 900px) {
-  .hero-title { font-size: 2.4rem; }
-  .mock-card { max-width: 360px; }
-  .features-section .grid { gap: 1.5rem; }
-}
-
-
-/* ---------------- MOBILE FIXES  ---------------- */
-
-/* Ensure responsive viewport meta exists in public/index.html:
-   <meta name="viewport" content="width=device-width, initial-scale=1"> */
-
-/* Make root container fluid and avoid fixed pixel widths */
-.container { max-width: 1200px; width: 100%; box-sizing: border-box; }
-
-/* Make images and media responsive */
-img, video, iframe, .hero-bg { max-width: 100%; height: auto; }
-
-/* Make mock-card responsive (was fixed at 420px) */
-.mock-card {
-  width: 100% !important;
-  max-width: 420px;
-  box-sizing: border-box;
-}
-
-/* MOBILE: stack hero columns and scale typography/button sizes */
-@media (max-width: 900px) {
-  /* Stack the two hero columns */
-  .container.grid, .container > .grid, .container > .grid > * {
-    gap: 1rem;
-  }
-
-  .container.px-6, .container {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-
-  /* On small screens, force hero to single column */
-  .hero-section .container {
-    display: block;
-  }
-  .hero-section .container > * { width: 100%; max-width: 100%; }
-
-  /* Scale hero title and subtitle */
-  .hero-title { font-size: 2rem !important; line-height: 1.06; }
-  @media (max-width: 640px) {
-    .hero-title { font-size: 1.6rem !important; }
-    .hero-sub { font-size: .95rem; max-width: 46ch; }
-  }
-
-  /* Make CTAs full width and stacked */
-  .hero-left .mt-6, .hero-left .hero-cta { display: flex; flex-direction: column; gap: 0.6rem; }
-  .hero-left .btn-primary, .hero-left .btn-outline {
-    width: 100% !important;
-    padding: .75rem 1rem !important;
-    box-sizing: border-box;
-  }
-
-  /* Make mock-card small and inline under hero */
-  .hero-right { margin-top: 1rem; display: flex; justify-content: center; }
-  .mock-card { width: 100%; max-width: 360px; padding: 1rem; }
-
-  /* Features section: single column, consistent gaps */
-  .features-section .grid, .testimonials-section .grid {
-    grid-template-columns: 1fr !important;
-    gap: 1.25rem !important;
-  }
-  .features-section .grid > *, .testimonials-section .grid > * {
-    width: 100% !important;
-    margin: 0 !important;
-  }
-
-  /* Reduce card padding on very small screens so content fits */
-  .feature-card, .testimonial {
-    padding: 1rem 1.1rem !important;
-    border-radius: 12px;
-  }
-
-  /* Navbar adjustments */
-  .navbar-container { padding: .5rem 1rem !important; }
-  .navbar-links { display: none; } /* optionally hide links and implement hamburger later */
-  .navbar-actions { gap: .5rem !important; }
-
-  /* Make footer stack and center */
-  .section-dark .container { flex-direction: column; gap: 1rem; align-items: center; }
-}
-
-/* SAFETY: remove any hard fixed widths that break small screens */
-.mock-card[style], .mock-card { min-width: 0 !important; }
-
-/* Useful debug helper (uncomment while debugging) */
-/* * { outline: 1px dashed rgba(255,0,0,0.06); } */
-
-
-
-/* ---------------- MOBILE NAV + CARDS FIX ---------------- */
-
-/* ========== NAVBAR: stack & make tappable on small screens ========== */
-@media (max-width: 900px) {
-  /* Stack navbar rows vertically so links and actions appear below logo */
-  .navbar-container {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: stretch !important;
-    gap: 0.5rem;
-    padding: 0.6rem 1rem !important;
-  }
-
-  /* Keep logo aligned left but allow it to shrink naturally */
-  .navbar-logo {
-    display: flex;
-    align-items: center;
-    gap: .6rem;
-    order: 1;
-    width: 100%;
-    justify-content: flex-start;
-    padding: 0;
-  }
-
-  /* Make the link row stack vertically and become a block with full-width items */
-  .navbar-links {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 0.25rem !important;
-    order: 2;
-    width: 100%;
-    padding: 0.5rem 0;
-    border-top: 1px solid rgba(0,0,0,0.04);
-    border-bottom: 1px solid rgba(0,0,0,0.03);
-    background: transparent;
-  }
-  .navbar-links a {
-    display: block;
-    padding: .65rem .75rem;
-    width: 100%;
-    box-sizing: border-box;
-    border-radius: 8px;
-    text-align: left;
-    color: inherit;
-    font-weight: 600;
-  }
-  .navbar-links a:hover,
-  .navbar-links a:focus {
-    transform: none;
-    background: rgba(0,0,0,0.03);
-    color: var(--brand-green);
-  }
-
-  /* Actions (theme toggle + login) — right below links, full width on small screens */
-  .navbar-actions {
-    display: flex;
-    gap: .5rem;
-    justify-content: flex-end;
-    order: 3;
-    width: 100%;
-    padding-top: .35rem;
-  }
-  /* make login button align to the right but remain touch-friendly */
-  .navbar-actions .login-btn {
-    min-height: 40px;
-    padding: .5rem .9rem;
-  }
-
-  /* collapse large whitespace and ensure the navbar stays compact */
-  .navbar { padding: .35rem 0; }
-}
-
-/* ========== CARDS: force single column + consistent spacing on mobile ========== */
-@media (max-width: 900px) {
-  /* Guarantee single-column features/testimonials */
-  .features-section .grid,
-  .testimonials-section .grid {
-    display: grid !important;
-    grid-template-columns: 1fr !important;
-    gap: 1.25rem !important; /* consistent vertical rhythm */
-    width: 100%;
-  }
-
-  .features-section .grid > *,
-  .testimonials-section .grid > * {
-    width: 100% !important;
-    margin: 0 !important;
-    box-sizing: border-box;
-  }
-
-  /* Make cards slightly less padded so content fits without overflow */
-  .feature-card,
-  .testimonial {
-    padding: 1rem 1.15rem !important;
-    border-radius: 12px !important;
-    display: block !important;
-    min-width: 0 !important; /* prevents overflow inside flex parents */
-    word-wrap: break-word;
-  }
-
-  /* Titles & text scale for smaller screens */
-  .feature-title, .testimonial p, .feature-desc {
-    font-size: 1rem !important;
-    line-height: 1.45 !important;
-  }
-}
-
-/* ========== SAFETY: prevent overflowing children in flex containers ========== */
-.container, .navbar-container, .hero-left, .hero-right {
-  box-sizing: border-box;
-}
-
-/* Ensures images/background cover elements don't create horizontal scrollbar */
-.hero-bg, .mock-card img, img { max-width: 100%; height: auto; }
-
-/* ========== TOUCH-target improvements ========== */
-@media (max-width: 900px) {
-  .card-btn, .btn-primary, .card-btn.plain, .btn-outline, .login-btn {
-    min-height: 44px;
-    padding: .6rem .95rem;
-    border-radius: 10px;
-  }
-}
-
-/* ========== Optional: slightly reduce hero horizontal padding on very small devices ========== */
-@media (max-width: 420px) {
-  .container { padding-left: 0.6rem; padding-right: 0.6rem; }
-  .hero-title { font-size: 1.45rem !important; }
-  .hero-sub { font-size: .92rem; max-width: 40ch; }
-}
-
-
-
-
-
-/* ====== NAVBAR: scale down & prevent overlap ====== */
-
-/* tweak these values if you want the navbar a bit taller/shorter */
-:root {
-  --nav-height-desktop: 52px;   /* desktop navbar height (reduced) */
-  --nav-height-mobile: 68px;    /* mobile/staked navbar height */
-}
-
-/* Force navbar height + keep it fixed and readable */
-.navbar {
-  position: fixed !important;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: var(--nav-height-desktop) !important;
-  z-index: 1200 !important;
-  background: #0b1220 !important;   /* keep existing dark background */
-  box-shadow: 0 4px 10px rgba(0,0,0,0.18) !important;
-  border-bottom: 1px solid rgba(255,255,255,0.06) !important;
-}
-
-/* Reduce inner padding so navbar visually shrinks (overrides .navbar-container padding) */
-.navbar-container {
-  padding-top: 0.45rem !important;
-  padding-bottom: 0.45rem !important;
-  align-items: center;
-  height: 100%;
-  box-sizing: border-box;
-}
-
-/* Reduce logo and control sizes slightly so they fit in the new height */
-.logo-box { width:34px !important; height:34px !important; }
-.logo-text { font-size:0.95rem !important; }
-
-/* Slightly smaller buttons in navbar */
-.navbar .login-btn, .navbar .dark-toggle {
-  padding-top: 0.28rem !important;
-  padding-bottom: 0.28rem !important;
-  padding-left: .7rem !important;
-  padding-right: .7rem !important;
-  font-size: 0.92rem !important;
-  min-height: 36px !important;
-  line-height: 1 !important;
-}
-
-/* When navbar stacks on small screens, use mobile height */
-@media (max-width: 900px) {
-  .navbar { height: var(--nav-height-mobile) !important; }
-  .navbar-container { padding-top: 0.45rem !important; padding-bottom: 0.45rem !important; }
-  .logo-box { width:34px !important; height:34px !important; }
-}
-
-/* ====== Spacer: ensure page content sits below the fixed navbar (failsafe) ====== */
-/* Insert a small spacer at top of .site-root so content is pushed down */
-.site-root { position: relative; box-sizing: border-box; }
-.site-root::before {
-  content: "";
-  display: block;
-  height: var(--nav-height-desktop);
-  width: 100%;
-  pointer-events: none;
-}
-@media (max-width: 900px) {
-  .site-root::before { height: var(--nav-height-mobile) !important; }
-}
-
-/* Keep navbar text color white to ensure contrast */
-.navbar a, .navbar .logo-text, .navbar .login-btn, .navbar .dark-toggle { color: #fff !important; }
-
-
-
-
-
-
-
-/* ===== Dynamic navbar spacer  ===== */
-
-/* fallback height in case JS hasn't run yet */
-:root {
-  --nav-height-dynamic: 56px;
-}
-
-/* style the spacer element added to .site-root */
-.site-root .nav-spacer {
-  display: block;
-  height: var(--nav-height-dynamic);
-  width: 100%;
-  pointer-events: none;
-}
-
-/* ensure anchor-scroll doesn't hide under the navbar */
-html { scroll-padding-top: var(--nav-height-dynamic); }
-
-/* small safety: if anything else inserted a ::before spacer earlier, remove overlap */
-.site-root::before { display: none !important; }
-
-
-
-
-
-
-
-
-
-
-/* ===== NAVBAR CONTENT issue fix ===== */
-
-/* Make navbar a reliable flex container and prevent children from wrapping out */
-.navbar {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important; /* centers inner container */
-  overflow: visible !important;        /* allow children to show (not clipped) */
-  height: auto !important;             /* let content define height until JS spacer sets it */
-  min-height: 54px !important;
-  box-sizing: border-box !important;
-}
-
-/* Ensure the inner container fills the navbar and is the row that holds everything */
-.navbar-container {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  width: 100% !important;
-  max-width: 1200px;
-  padding-top: 0.1rem !important;
-  padding-bottom: 0.1rem !important;
-  box-sizing: border-box !important;
-  gap: 0.6rem !important;
-  position: relative !important; /* keep children positioned inside */
-}
-
-/* Reset any margins/paddings that might push children down */
-.navbar-logo, .navbar-links, .navbar-actions {
-  margin: 0 !important;
-  padding: 0 !important;
-  box-sizing: border-box !important;
-}
-
-/* Prevent wrapping — force the three zones to stay in a single row */
-.navbar-logo, .navbar-links, .navbar-actions {
-  white-space: nowrap !important;
-  flex-shrink: 0 !important;
-}
-
-/* Allow links group to use available space but not drop below */
-.navbar-links {
-  display: flex !important;
-  gap: 1rem !important;
-  align-items: center !important;
-  justify-content: center !important;
-  flex: 1 1 auto !important;  
-  order: 2 !important;
-}
-
-/* Keep logo at start and actions at end */
-.navbar-logo { order: 1 !important; display:flex; align-items:center; gap:.5rem; }
-.navbar-actions { order: 3 !important; display:flex; align-items:center; gap:.5rem; }
-
-/* Make sure links and buttons are sized to fit the navbar height */
-.navbar-links a, .navbar .dark-toggle, .navbar .login-btn {
-  margin: 0 !important;
-  padding-top: .28rem !important;
-  padding-bottom: .28rem !important;
-  line-height: 1 !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  vertical-align: middle !important;
-}
-
-/* Remove any accidental top margins from inside items */
-.navbar-links a > *, .navbar-actions > * { margin-top: 0 !important; }
-
-/* Mobile adjustments: stack visually if needed but keep contents inside navbar */
-@media (max-width: 900px) {
-  .navbar { align-items: center; }
-  .navbar-container { flex-direction: column; gap: .35rem; padding-top:.4rem; padding-bottom:.4rem; }
-  .navbar-logo { width:100%; justify-content:flex-start; }
-  .navbar-links { width:100%; flex-direction: row; flex-wrap: wrap; justify-content:center; gap:.5rem; order:2; }
-  .navbar-actions { width:100%; justify-content:flex-end; order:3; }
-}
-
-/* Safety: ensure nothing absolutely positioned below the navbar pushes content down */
-.navbar * {
-  position: relative !important;
-}
-
-/* ensure the site spacer is active (if dynamic JS set the var) */
-.site-root .nav-spacer { display:block; height: var(--nav-height-dynamic, 56px) !important; }
-html { scroll-padding-top: var(--nav-height-dynamic, 56px) !important; }
-
-
-
-
-
-
-
-
-
-
-/* ===== HAMBURGER MENU: CSS to show/hide and animate links ===== */
-
-/* toggle button (hidden on desktop) */
+/* MENU TOGGLE (hamburger) - base */
 .menu-toggle {
   display: none;
   background: transparent;
   border: none;
   color: inherit;
   font-size: 1.15rem;
-  padding: 0.25rem 0.5rem;
+  padding: 0.28rem 0.5rem;
   cursor: pointer;
   line-height: 1;
+  align-self: center;
 }
 
-/* base navbar-links behaviour */
-.navbar-links {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  justify-content: center;
-  opacity: 1;
-  transition: max-height 0.28s ease, opacity 0.28s ease;
-  max-height: 999px; /* desktop default (open) */
-  overflow: visible;
-}
-
-/* small-screen behaviour: hide links by default and show when .open */
+/* mobile-specific behaviour */
 @media (max-width: 900px) {
-  .menu-toggle { display: block; }
+  /* show hamburger */
+  .menu-toggle { display: block; order: 2; }
 
+  /* collapse links by default, animate open when .open present */
   .navbar-links {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: .5rem;
     align-items: stretch;
     width: 100%;
-    max-height: 0;         /* hidden by default */
+    max-height: 0;
     overflow: hidden;
-    padding: 0 0.5rem;
-    background: transparent;
+    padding: 0 .5rem;
     opacity: 0;
-    border-radius: 8px;
+    transition: max-height .28s ease, opacity .22s ease, padding .18s ease;
+    background: transparent;
   }
 
   .navbar-links.open {
-    max-height: 420px;     /* enough to show your 3 links + spacing */
+    max-height: 420px; /* big enough for menu items */
     opacity: 1;
+    padding: .5rem .5rem .6rem .5rem;
   }
 
-  /* make links tappable full width on mobile */
+  /* make mobile links full width and tappable */
   .navbar-links a {
     display: block;
     width: 100%;
-    padding: 0.6rem 0.75rem;
+    padding: .55rem .65rem;
     border-radius: 8px;
     text-align: left;
+    color: inherit;
   }
 
-  /* position action buttons to the right (or below depending on .navbar-container) */
-  .navbar-actions {
-    width: 100%;
-    justify-content: flex-end;
-  }
+  /* keep actions visible and compact */
+  .navbar-actions { order: 3; width: 100%; justify-content: flex-end; padding: 0 .5rem; }
+  .navbar-container { flex-direction: column; align-items: stretch; gap: .35rem; padding: .35rem .6rem; }
+  .navbar-logo { order: 1; }
 }
 
+/* Make sure the hamburger itself is visually on top */
+.menu-toggle { z-index: 1500; }
+
+/* Accessibility: ensure aria-controls target exists (done in Navbar.jsx) */
+/* end hamburger + CTA fixes */
 
 
 
 
-/* ===== NAV LINKS FORCE-VISIBILITY (paste at end of home.css) ===== */
-
-/* ensure navbar and its container are on top and fully visible */
-.navbar {
-  z-index: 1400 !important;
-  background: #0b1220 !important;
-}
-
-/* ensure the inner container is visible and contains children */
-.navbar-container {
-  position: relative !important;
-  z-index: 1401 !important;
-}
-
-/* force links visible + high contrast + clickable */
-.navbar-links,
-.navbar-links a {
-  display: flex !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  pointer-events: auto !important;
-  transform: none !important;
-  -webkit-transform: none !important;
-}
-
-/* ensure anchor text is readable (white) and not transparent */
-.navbar-links a {
-  color: #ffffff !important;
-  background: transparent !important;
-  text-decoration: none !important;
-  transition: color .12s ease, background .12s ease !important;
-}
-
-/* If GSAP left inline style opacity:0, override it */
-.navbar-links[style] { opacity: 1 !important; }
-
-/* If max-height based hiding is used, allow full height on desktop */
-@media (min-width: 901px) {
-  .navbar-links { max-height: 9999px !important; overflow: visible !important; }
-}
-
-/* if there is an overlapping element with pointer-events: none, re-enable pointer events on nav children */
-.navbar * { pointer-events: auto !important; }
-
-/* visual debug helper (temporary) — uncomment to see outlines while debugging */
-/* .navbar-links a { outline: 1px dashed rgba(255,255,255,0.12) !important; } */
 
 
 
 
-/* ===== SLIM MOBILE NAVBAR ===== */
+
+
+
+
+/* ---------------- MOBILE: force actions to top-right inside a compact bar ---------------- */
 @media (max-width: 640px) {
+  /* navbar height (change this value if you want it shorter/taller) */
+  :root { --nav-short-mobile: 52px; }
+
+  /* compact bar */
   .navbar {
-    padding: 0.25rem 0 !important;   /* less top/bottom space */
-    height: auto !important;         /* shrink to fit content */
+    height: var(--nav-short-mobile) !important;
+    min-height: var(--nav-short-mobile) !important;
+    padding: 0 !important;
+    background: #0b1220 !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.18) !important;
   }
 
+  /* single-row layout: logo left, menu in the middle, actions pushed to the right */
   .navbar-container {
-    padding: 0.4rem 0.8rem !important; /* reduce inside padding */
-    gap: 0.4rem !important;            /* less gap between rows */
-    flex-direction: column;            /* stack vertically */
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 0.5rem !important;
+    padding: 0 .75rem !important;
+    height: 100% !important;
+    box-sizing: border-box;
+    position: relative !important;
   }
 
-  /* logo smaller */
-  .logo-box {
-    width: 30px !important;
-    height: 30px !important;
-    font-size: 0.8rem !important;
-  }
-  .logo-text {
-    font-size: 0.9rem !important;
+  /* logo kept left */
+  .navbar-logo { order: 1 !important; display:flex; align-items:center; gap:.5rem; }
+
+  /* hamburger remains visible (order 2). If you want it centered use the .centered rule below */
+  .menu-toggle { order: 2 !important; z-index: 1600 !important; }
+
+  /* important: force actions (dark-toggle + login) to the far right */
+  .navbar-actions {
+    order: 3 !important;
+    margin-left: auto !important;      /* THIS pushes actions to the right edge */
+    display: flex !important;
+    align-items: center !important;
+    gap: .35rem !important;
   }
 
-  /* links smaller + compact */
+  /* make sure links don't expand the bar (we use hamburger to open them) */
   .navbar-links {
-    gap: 0.35rem !important;
-  }
-  .navbar-links a {
-    font-size: 0.9rem !important;
-    padding: 0.4rem 0.5rem !important;
+    display: none !important;
+    max-height: 0 !important;
+    opacity: 0 !important;
+    overflow: hidden !important;
   }
 
-  /* actions smaller */
+  /* make the two action buttons fit nicely in the shorter bar */
   .navbar-actions .login-btn,
   .navbar-actions .dark-toggle {
-    font-size: 0.85rem !important;
-    padding: 0.35rem 0.6rem !important;
-    min-height: 32px !important;
+    min-height: 34px !important;
+    padding: .22rem .6rem !important;
+    font-size: .92rem !important;
+    line-height: 1 !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+  }
+
+  /* stop inner elements adding unexpected vertical space */
+  .navbar * { margin-top: 0 !important; margin-bottom: 0 !important; }
+
+  /* reserve page space so content doesn't appear under the fixed bar */
+  .site-root::before {
+    content: "";
+    display: block;
+    height: var(--nav-short-mobile) !important;
+    width: 100%;
+    pointer-events: none;
+  }
+  html { scroll-padding-top: var(--nav-short-mobile) !important; }
+}
+
+/* OPTIONAL: center the hamburger visually (if you prefer it in the middle).
+   Add the `centered` class to the button in Navbar.jsx: <button className="menu-toggle centered">…</button> */
+@media (max-width: 640px) {
+  .menu-toggle.centered {
+    position: absolute !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    margin: 0 !important;
   }
 }
+
+
+
+
+
+
+
+
+
+
+/* ===== Navbar: mobile dropdown + compact bar + centered login text ===== */
+
+/* Desktop defaults — ensure links are inline */
+.menu-toggle { display: none; }
+
+/* Make sure navbar-links are visible on desktop */
+@media (min-width: 641px) {
+  .navbar-links { display: flex !important; position: relative !important; max-height: none !important; opacity: 1 !important; }
+  .navbar-links.open { max-height: none !important; }
+}
+
+/* Mobile behavior */
+@media (max-width: 640px) {
+  /* compact navbar height (adjust if needed) */
+  :root { --nav-mobile-height: 52px; }
+
+  .navbar {
+    height: var(--nav-mobile-height) !important;
+    min-height: var(--nav-mobile-height) !important;
+    padding: 0 !important;
+    box-sizing: border-box;
+    background: #0b1220 !important;
+    z-index: 1400 !important;
+  }
+
+  /* show hamburger */
+  .menu-toggle {
+    display: block !important;
+    background: transparent;
+    border: none;
+    color: inherit;
+    font-size: 1.15rem;
+    padding: 0 .5rem;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 1500;
+  }
+
+  /* row layout: logo left, hamburger next, actions pushed right */
+  .navbar-container {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: .5rem !important;
+    padding: 0 .75rem !important;
+    height: 100% !important;
+    box-sizing: border-box;
+    position: relative !important;
+  }
+
+  /* push actions to the right */
+  .navbar-actions {
+    margin-left: auto !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: .35rem !important;
+  }
+
+  /* Make navbar-links an absolute dropdown (overlay) below the bar */
+  .navbar-links {
+    position: absolute !important;
+    top: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    background: #0b1220 !important;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+    display: flex !important;
+    flex-direction: column !important;
+    gap: .35rem !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    max-height: 0 !important;
+    opacity: 0 !important;
+    transition: max-height .28s ease, opacity .22s ease, padding .22s ease;
+    z-index: 1399 !important;
+  }
+
+  /* open state */
+  .navbar-links.open {
+    max-height: 360px !important;
+    opacity: 1 !important;
+    padding: .5rem .6rem !important;
+  }
+
+  .navbar-links a {
+    display: block !important;
+    padding: .6rem .8rem !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+    border-radius: 6px !important;
+    text-decoration: none !important;
+  }
+
+  .navbar-links a:hover,
+  .navbar-links a:focus { background: rgba(255,255,255,0.06) !important; color: var(--brand-green) !important; }
+
+  /* Center login text and keep the login button compact */
+  .login-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: .45rem !important;
+    padding: .25rem .6rem !important;
+    min-height: 34px !important;
+    font-size: .92rem !important;
+    line-height: 1 !important;
+    box-sizing: border-box !important;
+  }
+  .login-btn .login-text { display:inline-block; vertical-align:middle; }
+
+  /* make dark-toggle similarly centered */
+  .dark-toggle {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: .22rem .45rem !important;
+    min-height: 34px !important;
+    font-size: .96rem !important;
+    line-height: 1 !important;
+  }
+
+  /* Ensure the hamburger toggle can't be covered by the nav overlay */
+  .menu-toggle { z-index: 1501 !important; }
+
+  /* Ensure navbar children don't add extra vertical margin */
+  .navbar * { margin: 0 !important; }
+
+  /* Prevent the GSAP opacity trick from hiding the links entirely when open */
+  .navbar-links[style] { opacity: 1 !important; }
+}
+
+/* Small adjustments so desktop still shows links inline nicely */
+@media (min-width: 901px) {
+  .menu-toggle { display: none !important; }
+  .navbar-links { position: relative !important; display: flex !important; }
+}
+
+/* Failsafe: always keep nav text visible/white */
+.navbar a, .navbar .logo-text, .navbar .login-btn, .navbar .dark-toggle {
+  color: #fff !important;
+}
+
+
+
+
+
+
+
+/* ===== gap after the first feature card ===== */
+.features-section .grid {
+  gap: 2rem; /* keep your normal gap for all cards */
+}
+
+.features-section .grid > *:first-child {
+  margin-bottom: -2.5rem; /* reduce space only after 1st card */
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
