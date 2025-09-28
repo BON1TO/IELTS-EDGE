@@ -99,6 +99,8 @@ export default function HomePage() {
 
   return (
     <div className="site-root">
+  <div className="nav-spacer" aria-hidden="true" />
+
       <Navbar />
 
       <div className="pt-20 md:pt-24">

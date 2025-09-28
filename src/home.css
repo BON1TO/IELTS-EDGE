@@ -392,3 +392,418 @@ html,body,#root { height:100%; }
   .mock-card { max-width: 360px; }
   .features-section .grid { gap: 1.5rem; }
 }
+
+
+/* ---------------- MOBILE FIXES  ---------------- */
+
+/* Ensure responsive viewport meta exists in public/index.html:
+   <meta name="viewport" content="width=device-width, initial-scale=1"> */
+
+/* Make root container fluid and avoid fixed pixel widths */
+.container { max-width: 1200px; width: 100%; box-sizing: border-box; }
+
+/* Make images and media responsive */
+img, video, iframe, .hero-bg { max-width: 100%; height: auto; }
+
+/* Make mock-card responsive (was fixed at 420px) */
+.mock-card {
+  width: 100% !important;
+  max-width: 420px;
+  box-sizing: border-box;
+}
+
+/* MOBILE: stack hero columns and scale typography/button sizes */
+@media (max-width: 900px) {
+  /* Stack the two hero columns */
+  .container.grid, .container > .grid, .container > .grid > * {
+    gap: 1rem;
+  }
+
+  .container.px-6, .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  /* On small screens, force hero to single column */
+  .hero-section .container {
+    display: block;
+  }
+  .hero-section .container > * { width: 100%; max-width: 100%; }
+
+  /* Scale hero title and subtitle */
+  .hero-title { font-size: 2rem !important; line-height: 1.06; }
+  @media (max-width: 640px) {
+    .hero-title { font-size: 1.6rem !important; }
+    .hero-sub { font-size: .95rem; max-width: 46ch; }
+  }
+
+  /* Make CTAs full width and stacked */
+  .hero-left .mt-6, .hero-left .hero-cta { display: flex; flex-direction: column; gap: 0.6rem; }
+  .hero-left .btn-primary, .hero-left .btn-outline {
+    width: 100% !important;
+    padding: .75rem 1rem !important;
+    box-sizing: border-box;
+  }
+
+  /* Make mock-card small and inline under hero */
+  .hero-right { margin-top: 1rem; display: flex; justify-content: center; }
+  .mock-card { width: 100%; max-width: 360px; padding: 1rem; }
+
+  /* Features section: single column, consistent gaps */
+  .features-section .grid, .testimonials-section .grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.25rem !important;
+  }
+  .features-section .grid > *, .testimonials-section .grid > * {
+    width: 100% !important;
+    margin: 0 !important;
+  }
+
+  /* Reduce card padding on very small screens so content fits */
+  .feature-card, .testimonial {
+    padding: 1rem 1.1rem !important;
+    border-radius: 12px;
+  }
+
+  /* Navbar adjustments */
+  .navbar-container { padding: .5rem 1rem !important; }
+  .navbar-links { display: none; } /* optionally hide links and implement hamburger later */
+  .navbar-actions { gap: .5rem !important; }
+
+  /* Make footer stack and center */
+  .section-dark .container { flex-direction: column; gap: 1rem; align-items: center; }
+}
+
+/* SAFETY: remove any hard fixed widths that break small screens */
+.mock-card[style], .mock-card { min-width: 0 !important; }
+
+/* Useful debug helper (uncomment while debugging) */
+/* * { outline: 1px dashed rgba(255,0,0,0.06); } */
+
+
+
+/* ---------------- MOBILE NAV + CARDS FIX ---------------- */
+
+/* ========== NAVBAR: stack & make tappable on small screens ========== */
+@media (max-width: 900px) {
+  /* Stack navbar rows vertically so links and actions appear below logo */
+  .navbar-container {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem !important;
+  }
+
+  /* Keep logo aligned left but allow it to shrink naturally */
+  .navbar-logo {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    order: 1;
+    width: 100%;
+    justify-content: flex-start;
+    padding: 0;
+  }
+
+  /* Make the link row stack vertically and become a block with full-width items */
+  .navbar-links {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.25rem !important;
+    order: 2;
+    width: 100%;
+    padding: 0.5rem 0;
+    border-top: 1px solid rgba(0,0,0,0.04);
+    border-bottom: 1px solid rgba(0,0,0,0.03);
+    background: transparent;
+  }
+  .navbar-links a {
+    display: block;
+    padding: .65rem .75rem;
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 8px;
+    text-align: left;
+    color: inherit;
+    font-weight: 600;
+  }
+  .navbar-links a:hover,
+  .navbar-links a:focus {
+    transform: none;
+    background: rgba(0,0,0,0.03);
+    color: var(--brand-green);
+  }
+
+  /* Actions (theme toggle + login) — right below links, full width on small screens */
+  .navbar-actions {
+    display: flex;
+    gap: .5rem;
+    justify-content: flex-end;
+    order: 3;
+    width: 100%;
+    padding-top: .35rem;
+  }
+  /* make login button align to the right but remain touch-friendly */
+  .navbar-actions .login-btn {
+    min-height: 40px;
+    padding: .5rem .9rem;
+  }
+
+  /* collapse large whitespace and ensure the navbar stays compact */
+  .navbar { padding: .35rem 0; }
+}
+
+/* ========== CARDS: force single column + consistent spacing on mobile ========== */
+@media (max-width: 900px) {
+  /* Guarantee single-column features/testimonials */
+  .features-section .grid,
+  .testimonials-section .grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 1.25rem !important; /* consistent vertical rhythm */
+    width: 100%;
+  }
+
+  .features-section .grid > *,
+  .testimonials-section .grid > * {
+    width: 100% !important;
+    margin: 0 !important;
+    box-sizing: border-box;
+  }
+
+  /* Make cards slightly less padded so content fits without overflow */
+  .feature-card,
+  .testimonial {
+    padding: 1rem 1.15rem !important;
+    border-radius: 12px !important;
+    display: block !important;
+    min-width: 0 !important; /* prevents overflow inside flex parents */
+    word-wrap: break-word;
+  }
+
+  /* Titles & text scale for smaller screens */
+  .feature-title, .testimonial p, .feature-desc {
+    font-size: 1rem !important;
+    line-height: 1.45 !important;
+  }
+}
+
+/* ========== SAFETY: prevent overflowing children in flex containers ========== */
+.container, .navbar-container, .hero-left, .hero-right {
+  box-sizing: border-box;
+}
+
+/* Ensures images/background cover elements don't create horizontal scrollbar */
+.hero-bg, .mock-card img, img { max-width: 100%; height: auto; }
+
+/* ========== TOUCH-target improvements ========== */
+@media (max-width: 900px) {
+  .card-btn, .btn-primary, .card-btn.plain, .btn-outline, .login-btn {
+    min-height: 44px;
+    padding: .6rem .95rem;
+    border-radius: 10px;
+  }
+}
+
+/* ========== Optional: slightly reduce hero horizontal padding on very small devices ========== */
+@media (max-width: 420px) {
+  .container { padding-left: 0.6rem; padding-right: 0.6rem; }
+  .hero-title { font-size: 1.45rem !important; }
+  .hero-sub { font-size: .92rem; max-width: 40ch; }
+}
+
+
+
+
+
+/* ====== NAVBAR: scale down & prevent overlap ====== */
+
+/* tweak these values if you want the navbar a bit taller/shorter */
+:root {
+  --nav-height-desktop: 52px;   /* desktop navbar height (reduced) */
+  --nav-height-mobile: 68px;    /* mobile/staked navbar height */
+}
+
+/* Force navbar height + keep it fixed and readable */
+.navbar {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--nav-height-desktop) !important;
+  z-index: 1200 !important;
+  background: #0b1220 !important;   /* keep existing dark background */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.18) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+}
+
+/* Reduce inner padding so navbar visually shrinks (overrides .navbar-container padding) */
+.navbar-container {
+  padding-top: 0.45rem !important;
+  padding-bottom: 0.45rem !important;
+  align-items: center;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+/* Reduce logo and control sizes slightly so they fit in the new height */
+.logo-box { width:34px !important; height:34px !important; }
+.logo-text { font-size:0.95rem !important; }
+
+/* Slightly smaller buttons in navbar */
+.navbar .login-btn, .navbar .dark-toggle {
+  padding-top: 0.28rem !important;
+  padding-bottom: 0.28rem !important;
+  padding-left: .7rem !important;
+  padding-right: .7rem !important;
+  font-size: 0.92rem !important;
+  min-height: 36px !important;
+  line-height: 1 !important;
+}
+
+/* When navbar stacks on small screens, use mobile height */
+@media (max-width: 900px) {
+  .navbar { height: var(--nav-height-mobile) !important; }
+  .navbar-container { padding-top: 0.45rem !important; padding-bottom: 0.45rem !important; }
+  .logo-box { width:34px !important; height:34px !important; }
+}
+
+/* ====== Spacer: ensure page content sits below the fixed navbar (failsafe) ====== */
+/* Insert a small spacer at top of .site-root so content is pushed down */
+.site-root { position: relative; box-sizing: border-box; }
+.site-root::before {
+  content: "";
+  display: block;
+  height: var(--nav-height-desktop);
+  width: 100%;
+  pointer-events: none;
+}
+@media (max-width: 900px) {
+  .site-root::before { height: var(--nav-height-mobile) !important; }
+}
+
+/* Keep navbar text color white to ensure contrast */
+.navbar a, .navbar .logo-text, .navbar .login-btn, .navbar .dark-toggle { color: #fff !important; }
+
+
+
+
+
+
+
+/* ===== Dynamic navbar spacer  ===== */
+
+/* fallback height in case JS hasn't run yet */
+:root {
+  --nav-height-dynamic: 56px;
+}
+
+/* style the spacer element added to .site-root */
+.site-root .nav-spacer {
+  display: block;
+  height: var(--nav-height-dynamic);
+  width: 100%;
+  pointer-events: none;
+}
+
+/* ensure anchor-scroll doesn't hide under the navbar */
+html { scroll-padding-top: var(--nav-height-dynamic); }
+
+/* small safety: if anything else inserted a ::before spacer earlier, remove overlap */
+.site-root::before { display: none !important; }
+
+
+
+
+
+
+
+
+
+
+/* ===== NAVBAR CONTENT issue fix ===== */
+
+/* Make navbar a reliable flex container and prevent children from wrapping out */
+.navbar {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important; /* centers inner container */
+  overflow: visible !important;        /* allow children to show (not clipped) */
+  height: auto !important;             /* let content define height until JS spacer sets it */
+  min-height: 54px !important;
+  box-sizing: border-box !important;
+}
+
+/* Ensure the inner container fills the navbar and is the row that holds everything */
+.navbar-container {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  max-width: 1200px;
+  padding-top: 0.1rem !important;
+  padding-bottom: 0.1rem !important;
+  box-sizing: border-box !important;
+  gap: 0.6rem !important;
+  position: relative !important; /* keep children positioned inside */
+}
+
+/* Reset any margins/paddings that might push children down */
+.navbar-logo, .navbar-links, .navbar-actions {
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* Prevent wrapping — force the three zones to stay in a single row */
+.navbar-logo, .navbar-links, .navbar-actions {
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+}
+
+/* Allow links group to use available space but not drop below */
+.navbar-links {
+  display: flex !important;
+  gap: 1rem !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 1 1 auto !important;  
+  order: 2 !important;
+}
+
+/* Keep logo at start and actions at end */
+.navbar-logo { order: 1 !important; display:flex; align-items:center; gap:.5rem; }
+.navbar-actions { order: 3 !important; display:flex; align-items:center; gap:.5rem; }
+
+/* Make sure links and buttons are sized to fit the navbar height */
+.navbar-links a, .navbar .dark-toggle, .navbar .login-btn {
+  margin: 0 !important;
+  padding-top: .28rem !important;
+  padding-bottom: .28rem !important;
+  line-height: 1 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  vertical-align: middle !important;
+}
+
+/* Remove any accidental top margins from inside items */
+.navbar-links a > *, .navbar-actions > * { margin-top: 0 !important; }
+
+/* Mobile adjustments: stack visually if needed but keep contents inside navbar */
+@media (max-width: 900px) {
+  .navbar { align-items: center; }
+  .navbar-container { flex-direction: column; gap: .35rem; padding-top:.4rem; padding-bottom:.4rem; }
+  .navbar-logo { width:100%; justify-content:flex-start; }
+  .navbar-links { width:100%; flex-direction: row; flex-wrap: wrap; justify-content:center; gap:.5rem; order:2; }
+  .navbar-actions { width:100%; justify-content:flex-end; order:3; }
+}
+
+/* Safety: ensure nothing absolutely positioned below the navbar pushes content down */
+.navbar * {
+  position: relative !important;
+}
+
+/* ensure the site spacer is active (if dynamic JS set the var) */
+.site-root .nav-spacer { display:block; height: var(--nav-height-dynamic, 56px) !important; }
+html { scroll-padding-top: var(--nav-height-dynamic, 56px) !important; }

@@ -1,9 +1,11 @@
 // src/components/Navbar.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react"; // <-- added useRef
 import gsap from "gsap";
-import { Link } from "react-router-dom"; // <-- added
+import { Link } from "react-router-dom";
 
 export default function Navbar() {
+  const navbarRef = useRef(null); // new
+
   const [dark, setDark] = useState(() => {
     try {
       const saved = localStorage.getItem("theme");
@@ -34,22 +36,54 @@ export default function Navbar() {
     );
   }, []);
 
+  // --------- NEW: measure navbar and set CSS var to exact height ----------
+  useEffect(() => {
+    const setNavHeight = () => {
+      try {
+        const el = navbarRef.current || document.querySelector(".navbar");
+        if (!el) return;
+        const h = Math.ceil(el.getBoundingClientRect().height);
+        document.documentElement.style.setProperty("--nav-height-dynamic", `${h}px`);
+        document.documentElement.style.setProperty("scroll-padding-top", `${h}px`);
+      } catch (e) {
+        // ignore
+      }
+    };
+
+    // initial measure
+    setNavHeight();
+
+    // refresh on resize / orientation change
+    window.addEventListener("resize", setNavHeight);
+    window.addEventListener("orientationchange", setNavHeight);
+
+    // fonts can change layout — measure after fonts ready
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(setNavHeight).catch(() => {});
+    }
+
+    return () => {
+      window.removeEventListener("resize", setNavHeight);
+      window.removeEventListener("orientationchange", setNavHeight);
+    };
+  }, []);
+  // ---------------------------------------------------------------------
+
   const handleToggle = () => {
     setDark((d) => {
       const next = !d;
-      // set dataset immediately (extra safety)
       try {
         document.documentElement.setAttribute("data-theme", next ? "dark" : "light");
         localStorage.setItem("theme", next ? "dark" : "light");
       } catch {}
-      // small debug log so you can see it fired
       console.log("Theme toggled ->", next ? "dark" : "light");
       return next;
     });
   };
 
   return (
-    <header className="navbar" role="banner">
+    // attach ref here
+    <header ref={navbarRef} className="navbar" role="banner">
       <div className="navbar-container">
         {/* Logo */}
         <a href="#home" className="navbar-logo" aria-label="IeltsEdge home">
